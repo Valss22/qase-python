@@ -1,4 +1,5 @@
 import sys
+import types
 import uuid
 from functools import wraps
 from qaseio.commons.models.runtime import Runtime
@@ -56,7 +57,9 @@ class Interceptor:
             request.method = method
             request.url = url
 
-            interceptor._log_pre_request(request)
+            if not isinstance(request, types.FunctionType):
+                interceptor._log_pre_request(request)
+
             response = func(self, method, url, *args, **kwargs)
             if response is not None and interceptor.track_on_fail and response.status >= 400:
                 interceptor._log_post_response(response, url=url)
